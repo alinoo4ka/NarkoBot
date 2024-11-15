@@ -105,7 +105,7 @@ async def describe_planet(message: types.Message):
     else:
         await message.answer("Планета не найдена! 🕵️‍♀️")
       
-def find_planet_task():
+async def find_planet_task():
   global discovered_planets
   global space_artifacts
   global planet_names
@@ -124,7 +124,7 @@ def find_planet_task():
       update_discoveries(found_message)
     await asyncio.sleep(1800) 
     
-def update_discoveries(found_message):
+async def update_discoveries(found_message):
     global discovered_planets
     global space_artifacts
     global planet_names
@@ -136,12 +136,12 @@ def update_discoveries(found_message):
     if "осколок астероида" in found_message:
         space_artifacts.append("осколок астероида с редкими минералами")
 
-def generate_planet_name():
+async def generate_planet_name():
     prefixes = ["Альта", "Бета", "Гамма", "Дельта", "Эпсилон", "Зи", "Эта", "Тета", "Йота", "Каппа"]
     suffixes = ["-42", "-77", "-13", "-99", "-20"]
     return random.choice(prefixes) + random.choice(suffixes)
 
-def calculate_level(planets_discovered):
+async def calculate_level(planets_discovered):
     if planets_discovered < 5:
         return 1
     elif planets_discovered < 10:
