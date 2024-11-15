@@ -142,7 +142,7 @@ def calculate_level(planets_discovered):
 
 
 async def main():
-    asyncio.create_task(find_planet_task()) # Запускаем задачу поиска планет
+    asyncio.create_task(find_planet_task(message)) # Запускаем задачу поиска планет
     await dp.start_polling()
 
 if __name__ == '__main__':
