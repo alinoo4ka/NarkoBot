@@ -64,11 +64,11 @@ async def show_level(message: types.Message):
   response += f"Чтобы прокачать уровень необходимо:\n"
   response += f"Планеты {discovered_planets}/{required_planets}"
   if current_level < 5:
-      keyboard = types.InlineKeyboardMarkup()
-      keyboard.add(types.InlineKeyboardButton("Повысить", callback_data="upgrade_level"))
-      await message.answer(response, reply_markup=keyboard)
-    else:
-      await message.answer(response)
+    keyboard = types.InlineKeyboardMarkup()
+    keyboard.add(types.InlineKeyboardButton("Повысить", callback_data="upgrade_level"))
+    await message.answer(response, reply_markup=keyboard)
+  else:
+    await message.answer(response)
 
 @dp.callback_query_handler(lambda c: c.data == 'upgrade_level')
 async def process_callback_upgrade_level(call: types.CallbackQuery):
