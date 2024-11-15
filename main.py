@@ -1,7 +1,7 @@
 import asyncio
 import random
 from aiogram import Bot, Dispatcher, types
-from aiogram.utils import executor
+from aiogram.utils import executorb
 from datetime import datetime
 
 API_TOKEN = '7632478806:AAElMiV06yQtnPHKgjbF_UPM0JuQiKcOlSE'
