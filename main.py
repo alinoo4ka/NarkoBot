@@ -57,18 +57,18 @@ async def set_nickname(message: types.Message):
 async def show_level(message: types.Message):
   global last_message
   last_message = message # Обновляем last_message
-    nickname = user_nicknames.get(message.from_user.id)
-    current_level = calculate_level(discovered_planets)
-    required_planets = level_prices[current_level - 1] if current_level < 5 else 0
-    response = f"{nickname}, ваш уровень на данный момент: {current_level}\n" if nickname else f"Ваш уровень на данный момент: {current_level}\n"
-    response += f"Чтобы прокачать уровень необходимо:\n"
-    response += f"Планеты {discovered_planets}/{required_planets}"
-    if current_level < 5:
-        keyboard = types.InlineKeyboardMarkup()
-        keyboard.add(types.InlineKeyboardButton("Повысить", callback_data="upgrade_level"))
-        await message.answer(response, reply_markup=keyboard)
+  nickname = user_nicknames.get(message.from_user.id)
+  current_level = calculate_level(discovered_planets)
+  required_planets = level_prices[current_level - 1] if current_level < 5 else 0
+  response = f"{nickname}, ваш уровень на данный момент: {current_level}\n" if nickname else f"Ваш уровень на данный момент: {current_level}\n"
+  response += f"Чтобы прокачать уровень необходимо:\n"
+  response += f"Планеты {discovered_planets}/{required_planets}"
+  if current_level < 5:
+      keyboard = types.InlineKeyboardMarkup()
+      keyboard.add(types.InlineKeyboardButton("Повысить", callback_data="upgrade_level"))
+      await message.answer(response, reply_markup=keyboard)
     else:
-        await message.answer(response)
+      await message.answer(response)
 
 @dp.callback_query_handler(lambda c: c.data == 'upgrade_level')
 async def process_callback_upgrade_level(call: types.CallbackQuery):
