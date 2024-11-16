@@ -4,7 +4,7 @@ from aiogram import Bot, Dispatcher, types
 from aiogram.utils import executor
 from datetime import datetime
 
-API_TOKEN = '7632478806:AAElMiV06yQtnPHKgjbF_UPM0JuQiKcOlSE'
+API_TOKEN = '7632478806:AAElMiV06yQtnPHKgjbF_UPM0JuQiKcOlSE' # Замените на ваш токен
 
 bot = Bot(token=API_TOKEN)
 dp = Dispatcher(bot)
@@ -14,35 +14,41 @@ space_artifacts = []
 planet_names = []
 user_nicknames = {}
 start_time = None
-level_prices = [10, 30, 90, 270] # Цены на повышение уровня
-last_message = None # Глобальная переменная для хранения сообщения
+level_prices = [10, 30, 90, 270]
+last_message = None
+last_planet_search = 0
+
 
 @dp.message_handler(commands=['start'])
 async def start_message(message: types.Message):
   global start_time, last_message
   start_time = datetime.now()
-  last_message = message 
+  last_message = message
   await message.answer("Привет! Я - бот, который любит исследовать космос. 🚀\n\n"
             "Начнем с создания вашего никнейма! Используйте команду /гник [никнейм]")
 
+
 @dp.message_handler(commands=['космос'])
 async def show_discoveries(message: types.Message):
-  global last_message
-  last_message = message # Обновляем last_message 
+  response = f"Найденные планеты: {', '.join(planet_names) or 'Еще не найдено ни одной планеты'}\n" # Только планеты
+  await message.answer(response)
+
+
+@dp.message_handler(commands=['проф', 'профиль'])
+async def show_profile(message: types.Message):
   nickname = user_nicknames.get(message.from_user.id)
   response = f"{nickname}, ваш профиль:\n" if nickname else "Ваш профиль:\n"
   response += f"Всего найдено планет: {discovered_planets}\n"
-  response += f"Всего раз искали планет: {len(planet_names)}\n"
+  response += f"Найденные планеты: {', '.join(planet_names) or 'Еще не найдено ни одной планеты'}\n"
   response += f"Найдено космических кораблей: {space_artifacts.count('космический корабль древней цивилизации')}\n"
   response += f"Найдено осколков астероида: {space_artifacts.count('осколок астероида с редкими минералами')}\n"
   response += f"Ваш игровой уровень: {calculate_level(discovered_planets)}\n"
   response += f"Играете в бота с {start_time.strftime('%d.%m.%Y %H:%M')}"
   await message.answer(response)
 
+
 @dp.message_handler(commands=['гник'])
 async def set_nickname(message: types.Message):
-  global user_nicknames, last_message
-  last_message = message # Обновляем last_message
   args = message.text.split()
   if len(args) != 2:
     await message.answer("Неправильный формат команды! Используйте /гник [никнейм]")
@@ -54,27 +60,26 @@ async def set_nickname(message: types.Message):
   user_nicknames[message.from_user.id] = new_nickname
   await message.answer(f"Поздравляю! Вы успешно создали себе никнейм \"{new_nickname}\"")
 
+
 @dp.message_handler(commands=['уровень'])
 async def show_level(message: types.Message):
-  global last_message
-  last_message = message # Обновляем last_message
-  nickname = user_nicknames.get(message.from_user.id)
-  current_level = calculate_level(discovered_planets)
-  required_planets = level_prices[current_level - 1] if current_level < 5 else 0
-  response = f"{nickname}, ваш уровень на данный момент: {current_level}\n" if nickname else f"Ваш уровень на данный момент: {current_level}\n"
-  response += f"Чтобы прокачать уровень необходимо:\n"
-  response += f"Планеты {discovered_planets}/{required_planets}"
-  if current_level < 5:
-    keyboard = types.InlineKeyboardMarkup()
-    keyboard.add(types.InlineKeyboardButton("Повысить", callback_data="upgrade_level"))
-    await message.answer(response, reply_markup=keyboard)
-  else:
-    await message.answer(response)
+    nickname = user_nicknames.get(message.from_user.id)
+    current_level = calculate_level(discovered_planets)
+    required_planets = level_prices[current_level - 1] if current_level < 5 else 0
+    response = f"{nickname}, ваш уровень на данный момент: {current_level}\n" if nickname else f"Ваш уровень на данный момент: {current_level}\n"
+    response += f"Чтобы прокачать уровень необходимо:\n"
+    response += f"Планеты {discovered_planets}/{required_planets}"
+    if current_level < 5:
+        keyboard = types.InlineKeyboardMarkup()
+        keyboard.add(types.InlineKeyboardButton("Повысить", callback_data="upgrade_level"))
+        await message.answer(response, reply_markup=keyboard)
+    else:
+        await message.answer(response)
+
 
 @dp.callback_query_handler(lambda c: c.data == 'upgrade_level')
 async def process_callback_upgrade_level(call: types.CallbackQuery):
     global discovered_planets
-    user_id = call.from_user.id
     current_level = calculate_level(discovered_planets)
     required_planets = level_prices[current_level - 1] if current_level < 5 else 0
     if discovered_planets >= required_planets:
@@ -83,10 +88,31 @@ async def process_callback_upgrade_level(call: types.CallbackQuery):
     else:
         await call.message.edit_text("Недостаточно планет!")
 
+
+@dp.message_handler(regexp=r"^Искать планету$")
+async def find_planet(message: types.Message):
+    global last_message, last_planet_search, discovered_planets, space_artifacts, planet_names
+    last_message = message
+    current_time = datetime.now().timestamp()
+    time_since_last_search = current_time - last_planet_search
+    if time_since_last_search < 1800:
+        await message.answer("Подождите, пожалуйста, перед следующим поиском должно пройти 30 минут.")
+        return
+    last_planet_search = current_time
+    messages = [
+        "Отлично! Вы обнаружили новую планету в галактике Андромеды! 🎉\nПланета: {planet_name}",
+        "АХУЕТЬ! Во время сканирования космоса вы наткнулись на три новых объекта!\n+1 новая планета\nПланета: {planet_name}\n+космический корабль древней цивилизации\n+осколок астероида с редкими минералами",
+        "Удача улыбнулась вам! Вы нашли планету, похожую на Землю, в созвездии Ориона! 🌎\nПланета: {planet_name}",
+        "Ого! Вы обнаружили планету, вращающуюся вокруг двойной звезды! 🪐\nПланета: {planet_name}",
+        "Ваши исследования принесли плоды! Вы нашли новую планету с кольцами, как у Сатурна! 🪐\nПланета: {planet_name}"
+    ]
+    found_message = random.choice(messages).format(planet_name=generate_planet_name())
+    await message.answer(found_message)
+    update_discoveries(found_message)
+
+
 @dp.message_handler(regexp=r"^планета (.+)$")
 async def describe_planet(message: types.Message):
-    global last_message
-    last_message = message # Обновляем last_message
     planet_name = message.text.split()[1]
     planet_descriptions = {
         "Альта-42": "Планета Альта-42, покрытая лесами и озерами, славится своей богатой флорой и фауной.",
@@ -104,44 +130,29 @@ async def describe_planet(message: types.Message):
         await message.answer(description)
     else:
         await message.answer("Планета не найдена! 🕵️‍♀️")
-      
-async def find_planet_task():
-  global discovered_planets
-  global space_artifacts
-  global planet_names
-  global last_message 
-  while True:
-    if last_message is not None:
-      messages = [
-        "Отлично! Вы обнаружили новую планету в галактике Андромеды! 🎉\nПланета: {planet_name}",
-        "АХУЕТЬ! Во время сканирования космоса вы наткнулись на три новых объекта!\n+1 новая планета\nПланета: {planet_name}\n+космический корабль древней цивилизации\n+осколок астероида с редкими минералами",
-        "Удача улыбнулась вам! Вы нашли планету, похожую на Землю, в созвездии Ориона! 🌎\nПланета: {planet_name}",
-        "Ого! Вы обнаружили планету, вращающуюся вокруг двойной звезды! 🪐\nПланета: {planet_name}",
-        "Ваши исследования принесли плоды! Вы нашли новую планету с кольцами, как у Сатурна! 🪐\nПланета: {planet_name}"
-      ]
-      found_message = random.choice(messages).format(planet_name=generate_planet_name())
-      await last_message.answer(found_message)
-      update_discoveries(found_message)
-    await asyncio.sleep(1800) 
-    
-async def update_discoveries(found_message):
+
+
+def update_discoveries(found_message):
     global discovered_planets
     global space_artifacts
     global planet_names
     if "новую планету" in found_message:
         discovered_planets += 1
-        planet_names.append(generate_planet_name())
+        planet_name = found_message.split("Планета: ")[1].strip
+      planet_names.append(planet_name)
     if "космический корабль" in found_message:
         space_artifacts.append("космический корабль древней цивилизации")
     if "осколок астероида" in found_message:
         space_artifacts.append("осколок астероида с редкими минералами")
 
-async def generate_planet_name():
+
+def generate_planet_name():
     prefixes = ["Альта", "Бета", "Гамма", "Дельта", "Эпсилон", "Зи", "Эта", "Тета", "Йота", "Каппа"]
     suffixes = ["-42", "-77", "-13", "-99", "-20"]
     return random.choice(prefixes) + random.choice(suffixes)
 
-async def calculate_level(planets_discovered):
+
+def calculate_level(planets_discovered):
     if planets_discovered < 5:
         return 1
     elif planets_discovered < 10:
@@ -153,8 +164,8 @@ async def calculate_level(planets_discovered):
 
 
 async def main():
-    asyncio.create_task(find_planet_task()) # Запускаем задачу поиска планет
     await dp.start_polling()
+
 
 if __name__ == '__main__':
     asyncio.run(main())
