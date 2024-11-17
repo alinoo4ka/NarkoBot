@@ -138,7 +138,7 @@ def update_discoveries(found_message):
   global planet_names
   if "новую планету" in found_message:
     discovered_planets += 1
-    planet_name = found_message.split("Планета: ")[1].strip
+    planet_name = found_message.split("Планета: ")[1].strip()
     planet_names.append(planet_name)
   if "космический корабль" in found_message:
     space_artifacts.append("космический корабль древней цивилизации")
