@@ -133,17 +133,17 @@ async def describe_planet(message: types.Message):
 
 
 def update_discoveries(found_message):
-    global discovered_planets
-    global space_artifacts
-    global planet_names
-    if "новую планету" in found_message:
-        discovered_planets += 1
-        planet_name = found_message.split("Планета: ")[1].strip
-      planet_names.append(planet_name)
-    if "космический корабль" in found_message:
-        space_artifacts.append("космический корабль древней цивилизации")
-    if "осколок астероида" in found_message:
-        space_artifacts.append("осколок астероида с редкими минералами")
+  global discovered_planets
+  global space_artifacts
+  global planet_names
+  if "новую планету" in found_message:
+    discovered_planets += 1
+    planet_name = found_message.split("Планета: ")[1].strip
+    planet_names.append(planet_name)
+  if "космический корабль" in found_message:
+    space_artifacts.append("космический корабль древней цивилизации")
+  if "осколок астероида" in found_message:
+    space_artifacts.append("осколок астероида с редкими минералами")
 
 
 def generate_planet_name():
