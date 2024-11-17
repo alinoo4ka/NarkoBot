@@ -4,7 +4,7 @@ from aiogram import Bot, Dispatcher, types
 from aiogram.utils import executor
 from datetime import datetime
 
-API_TOKEN = '7632478806:AAElMiV06yQtnPHKgjbF_UPM0JuQiKcOlSE' # Замените на ваш токен
+API_TOKEN = '7865025693:AAE6RFJAgCQpUxYljnhagEca6W5lKZFKAv8' # Замените на ваш токен
 
 bot = Bot(token=API_TOKEN)
 dp = Dispatcher(bot)
