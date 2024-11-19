@@ -151,8 +151,8 @@ async def process_callback_upgrade_level(message: types.Message):
         update_user_data(user_id, *user_data[:1], discovered_planets - required_planets, *user_data[3:])
     else:
         await message.answer("Недостаточно планет!")
-    else:
-        await message.answer("Ошибка получения данных пользователя.")
+  else:
+    await message.answer("Ошибка получения данных пользователя.")
 
 def update_user_discoveries(user_id, found_message):
     user_data = get_user_data(user_id)
