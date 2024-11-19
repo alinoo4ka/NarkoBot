@@ -134,8 +134,8 @@ async def show_level(message: types.Message):
       await message.answer(response, reply_markup=types.ReplyKeyboardMarkup(keyboard=[[types.KeyboardButton(text="Повысить")]]))
     else:
       await message.answer(response)
-    else:
-      await message.answer("Ошибка получения данных пользователя.")
+  else:
+    await message.answer("Ошибка получения данных пользователя.")
       
 
 @dp.message_handler(lambda message: message.text == "Повысить")
