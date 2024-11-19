@@ -57,19 +57,19 @@ async def show_profile(message: types.Message):
   user_id = message.from_user.id
   user_data = get_user_data(user_id)
   if user_data:
-        nickname, discovered_planets, space_artifacts, planet_names_str, start_time_str = user_data
-        planet_names_list = [p.strip() for p in planet_names_str.split(',') if p.strip()] if planet_names_str else []
-        start_time_obj = datetime.fromisoformat(start_time_str)
-        response = f"{nickname}, ваш профиль:\n" if nickname else "Ваш профиль:\n"
-        response += f"Всего найдено планет: {discovered_planets}\n"
-        response += f"Найденные планеты:\n{('\n'.join(planet_names_list) or 'Еще не найдено ни одной планеты')}\n"
-        response += f"Найдено космических кораблей: {space_artifacts.count('космический корабль древней цивилизации')}\n"
-        response += f"Найдено осколков астероида: {space_artifacts.count('осколок астероида с редкими минералами')}\n"
-        response += f"Ваш игровой уровень: {calculate_level(discovered_planets)}\n"
-        response += f"Играете в бота с: {start_time_obj.strftime('%d.%m.%Y %H:%M')}"
-        await message.answer(response)
-    else:
-        await message.answer("Ошибка получения данных пользователя.")
+    nickname, discovered_planets, space_artifacts, planet_names_str, start_time_str = user_data
+    planet_names_list = [p.strip() for p in planet_names_str.split(',') if p.strip()] if planet_names_str else []
+    start_time_obj = datetime.fromisoformat(start_time_str)
+    response = f"{nickname}, ваш профиль:\n" if nickname else "Ваш профиль:\n"
+    response += f"Всего найдено планет: {discovered_planets}\n"
+    response += f"Найденные планеты:\n{('\n'.join(planet_names_list) or 'Еще не найдено ни одной планеты')}\n"
+    response += f"Найдено космических кораблей: {space_artifacts.count('космический корабль древней цивилизации')}\n"
+    response += f"Найдено осколков астероида: {space_artifacts.count('осколок астероида с редкими минералами')}\n"
+    response += f"Ваш игровой уровень: {calculate_level(discovered_planets)}\n"
+    response += f"Играете в бота с: {start_time_obj.strftime('%d.%m.%Y %H:%M')}"
+    await message.answer(response)
+  else:
+    await message.answer("Ошибка получения данных пользователя.")
 
 @dp.message_handler(commands=['planet', 'планета'])
 async def describe_planet(message: types.Message):
@@ -103,22 +103,21 @@ async def find_planet(message: types.Message):
     if user_data:
         last_planet_search_time = datetime.fromisoformat(user_data[-1]).timestamp()
         time_since_last_search = current_time - last_planet_search_time
-        if time_since_last_search < 1800:
-            await message.answer("Подождите, пожалуйста, перед следующим поиском должно пройти 30 минут.")
-            return
-
-        messages = [
-            "Отлично! Вы обнаружили новую планету в галактике Андромеды! 🎉\nПланета: {planet_name}",
-            "АХУЕТЬ! Во время сканирования космоса вы наткнулись на три новых объекта!\n+1 новая планета\nПланета: {planet_name}\n+космический корабль древней цивилизации\n+осколок астероида с редкими минералами",
-            "Удача улыбнулась вам! Вы нашли планету, похожую на Землю, в созвездии Ориона! 🌎\nПланета: {planet_name}",
-            "Ого! Вы обнаружили планету, вращающуюся вокруг двойной звезды! 🪐\nПланета: {planet_name}",
-            "Ваши исследования принесли плоды! Вы нашли новую планету с кольцами, как у Сатурна! 🪐\nПланета: {planet_name}"
-        ]
+    if time_since_last_search < 1800:
+      await message.answer("Подождите, пожалуйста, перед следующим поиском должно пройти 30 минут.")
+      return
+      messages = [
+        "Отлично! Вы обнаружили новую планету в галактике Андромеды! 🎉\nПланета: {planet_name}",
+        "АХУЕТЬ! Во время сканирования космоса вы наткнулись на три новых объекта!\n+1 новая планета\nПланета: {planet_name}\n+космический корабль древней цивилизации\n+осколок астероида с редкими минералами",
+        "Удача улыбнулась вам! Вы нашли планету, похожую на Землю, в созвездии Ориона! 🌎\nПланета: {planet_name}",
+        "Ого! Вы обнаружили планету, вращающуюся вокруг двойной звезды! 🪐\nПланета: {planet_name}",
+        "Ваши исследования принесли плоды! Вы нашли новую планету с кольцами, как у Сатурна! 🪐\nПланета: {planet_name}"
+      ]
       found_message = random.choice(messages).format(planet_name=generate_planet_name())
-await message.answer(found_message)
-update_user_discoveries(user_id, found_message)
-else:
-await message.answer("Ошибка получения данных пользователя.")
+      await message.answer(found_message)
+      update_user_discoveries(user_id, found_message)
+    else:
+      await message.answer("Ошибка получения данных пользователя.")
 
 @dp.message_handler(commands=['lvl', 'уровень'])
 async def show_level(message: types.Message):
@@ -131,10 +130,10 @@ async def show_level(message: types.Message):
         response = f"Ваш уровень на данный момент: {current_level}\n"
         response += f"Чтобы прокачать уровень необходимо:\n"
         response += f"Планеты: {discovered_planets}/{required_planets}"
-        if current_level < 5:
-            await message.answer(response, reply_markup=types.ReplyKeyboardMarkup(keyboard=[[types.KeyboardButton(text="Повысить")]]))
-        else:
-            await message.answer(response)
+    if current_level < 5:
+        await message.answer(response, reply_markup=types.ReplyKeyboardMarkup(keyboard=[[types.KeyboardButton(text="Повысить")]]))
+    else:
+        await message.answer(response)
     else:
         await message.answer("Ошибка получения данных пользователя.")
 
@@ -147,11 +146,11 @@ async def process_callback_upgrade_level(message: types.Message):
         discovered_planets = user_data[1]
         current_level = calculate_level(discovered_planets)
         required_planets = level_prices[current_level - 1] if current_level < 5 else 0
-        if discovered_planets >= required_planets:
-            await message.answer("Ваш уровень успешно повышен!")
-            update_user_data(user_id, *user_data[:1], discovered_planets - required_planets, *user_data[3:])
-        else:
-            await message.answer("Недостаточно планет!")
+    if discovered_planets >= required_planets:
+        await message.answer("Ваш уровень успешно повышен!")
+        update_user_data(user_id, *user_data[:1], discovered_planets - required_planets, *user_data[3:])
+    else:
+        await message.answer("Недостаточно планет!")
     else:
         await message.answer("Ошибка получения данных пользователя.")
 
@@ -159,18 +158,18 @@ def update_user_discoveries(user_id, found_message):
     user_data = get_user_data(user_id)
     if user_data:
         discovered_planets, space_artifacts_str, planet_names_str = user_data[1:4]
-        if "новую планету" in found_message:
-            discovered_planets += 1
-            try:
-                planet_name = found_message.split("Планета: ")[1].strip()
-                planet_names_str += ',' + planet_name if planet_names_str else planet_name
-            except IndexError:
-                print("Ошибка: Не удалось извлечь имя планеты из сообщения.")
+    if "новую планету" in found_message:
+        discovered_planets += 1
+      try:
+        planet_name = found_message.split("Планета: ")[1].strip()
+        planet_names_str += ',' + planet_name if planet_names_str else planet_name
+      except IndexError:
+        print("Ошибка: Не удалось извлечь имя планеты из сообщения.")
         if "космический корабль" in found_message:
             space_artifacts_str += ",космический корабль древней цивилизации"
         if "осколок астероида" in found_message:
             space_artifacts_str += ",осколок астероида с редкими минералами"
-        update_user_data(user_id, *user_data[:1], discovered_planets, space_artifacts_str, planet_names_str, user_data[-1])
+          update_user_data(user_id, *user_data[:1], discovered_planets, space_artifacts_str, planet_names_str, user_data[-1])
 
 def generate_planet_name():
     prefixes = ["Альта", "Бета", "Гамма", "Дельта", "Эпсилон", "Зи", "Эта", "Тета", "Йота", "Каппа"]
