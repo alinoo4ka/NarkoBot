@@ -187,7 +187,16 @@ def calculate_level(planets_discovered):
         return 4
 
 async def main():
-    await dp.start_polling()
+  await dp.start_polling()
+  
+async def on_startup(dp):
+  print('Бот запущен')
 
-if __name__ == '__main__':
-    asyncio.run(main())
+async def on_shutdown(dp):
+  await bot.close()
+  print('Бот остановлен')
+
+
+if __name__ == "__main__":
+  executor.start_polling(dp, on_startup=on_startup, on_shutdown=on_shutdown, skip_updates=True)
+
