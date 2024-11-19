@@ -121,22 +121,22 @@ async def find_planet(message: types.Message):
 
 @dp.message_handler(commands=['lvl', 'уровень'])
 async def show_level(message: types.Message):
-    user_id = message.from_user.id
-    user_data = get_user_data(user_id)
-    if user_data:
-        discovered_planets = user_data[1]
-        current_level = calculate_level(discovered_planets)
-        required_planets = level_prices[current_level - 1] if current_level < 5 else 0
-        response = f"Ваш уровень на данный момент: {current_level}\n"
-        response += f"Чтобы прокачать уровень необходимо:\n"
-        response += f"Планеты: {discovered_planets}/{required_planets}"
+  user_id = message.from_user.id
+  user_data = get_user_data(user_id)
+  if user_data:
+    discovered_planets = user_data[1]
+    current_level = calculate_level(discovered_planets)
+    required_planets = level_prices[current_level - 1] if current_level < 5 else 0
+    response = f"Ваш уровень на данный момент: {current_level}\n"
+    response += f"Чтобы прокачать уровень необходимо:\n"
+    response += f"Планеты: {discovered_planets}/{required_planets}"
     if current_level < 5:
-        await message.answer(response, reply_markup=types.ReplyKeyboardMarkup(keyboard=[[types.KeyboardButton(text="Повысить")]]))
+      await message.answer(response, reply_markup=types.ReplyKeyboardMarkup(keyboard=[[types.KeyboardButton(text="Повысить")]]))
     else:
-        await message.answer(response)
+      await message.answer(response)
     else:
-        await message.answer("Ошибка получения данных пользователя.")
-
+      await message.answer("Ошибка получения данных пользователя.")
+      
 
 @dp.message_handler(lambda message: message.text == "Повысить")
 async def process_callback_upgrade_level(message: types.Message):
