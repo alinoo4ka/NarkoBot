@@ -154,20 +154,20 @@ async def process_callback_upgrade_level(message: types.Message):
     await message.answer("Ошибка получения данных пользователя.")
 
 def update_user_discoveries(user_id, found_message):
-    user_data = get_user_data(user_id)
-    if user_data:
-        discovered_planets, space_artifacts_str, planet_names_str = user_data[1:4]
+  user_data = get_user_data(user_id)
+  if user_data:
+    discovered_planets, space_artifacts_str, planet_names_str = user_data[1:4]
     if "новую планету" in found_message:
-        discovered_planets += 1
+      discovered_planets += 1
       try:
         planet_name = found_message.split("Планета: ")[1].strip()
         planet_names_str += ',' + planet_name if planet_names_str else planet_name
       except IndexError:
         print("Ошибка: Не удалось извлечь имя планеты из сообщения.")
         if "космический корабль" in found_message:
-            space_artifacts_str += ",космический корабль древней цивилизации"
+          space_artifacts_str += ",космический корабль древней цивилизации"
         if "осколок астероида" in found_message:
-            space_artifacts_str += ",осколок астероида с редкими минералами"
+          space_artifacts_str += ",осколок астероида с редкими минералами"
           update_user_data(user_id, *user_data[:1], discovered_planets, space_artifacts_str, planet_names_str, user_data[-1])
 
 def generate_planet_name():
