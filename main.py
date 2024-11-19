@@ -47,7 +47,7 @@ async def show_discoveries(message: types.Message):
   user_data = get_user_data(user_id)
   if user_data:
     planet_names_list = [p.strip() for p in user_data[3].split(',') if p.strip()] if user_data[3] else []
-    response = f"Найденные планеты:\n{('\n'.join(planet_names_list) or 'Еще не найдено ни одной планеты')}"
+    response = f"Найденные планеты:\n{(', '.join(planet_names_list) or 'Еще не найдено ни одной планеты')}"
     await message.answer(response)
   else:
     await message.answer("Ошибка получения данных пользователя.")
@@ -62,7 +62,7 @@ async def show_profile(message: types.Message):
     start_time_obj = datetime.fromisoformat(start_time_str)
     response = f"{nickname}, ваш профиль:\n" if nickname else "Ваш профиль:\n"
     response += f"Всего найдено планет: {discovered_planets}\n"
-    response += f"Найденные планеты:\n{('\n'.join(planet_names_list) or 'Еще не найдено ни одной планеты')}\n"
+    response += f"Найденные планеты:\n{(', '.join(planet_names_list) or 'Еще не найдено ни одной планеты')}\n"
     response += f"Найдено космических кораблей: {space_artifacts.count('космический корабль древней цивилизации')}\n"
     response += f"Найдено осколков астероида: {space_artifacts.count('осколок астероида с редкими минералами')}\n"
     response += f"Ваш игровой уровень: {calculate_level(discovered_planets)}\n"
