@@ -137,22 +137,21 @@ async def show_level(message: types.Message):
   else:
     await message.answer("Ошибка получения данных пользователя.")
       
-
 @dp.message_handler(lambda message: message.text == "Повысить")
 async def process_callback_upgrade_level(message: types.Message):
-    user_id = message.from_user.id
-    user_data = get_user_data(user_id)
-    if user_data:
-        discovered_planets = user_data[1]
-        current_level = calculate_level(discovered_planets)
-        required_planets = level_prices[current_level - 1] if current_level < 5 else 0
+  user_id = message.from_user.id
+  user_data = get_user_data(user_id)
+  if user_data:
+    discovered_planets = user_data[1]
+    current_level = calculate_level(discovered_planets)
+    required_planets = level_prices[current_level - 1] if current_level < 5 else 0
     if discovered_planets >= required_planets:
-        await message.answer("Ваш уровень успешно повышен!")
-        update_user_data(user_id, *user_data[:1], discovered_planets - required_planets, *user_data[3:])
+      await message.answer("Ваш уровень успешно повышен!")
+      update_user_data(user_id, *user_data[:1], discovered_planets - required_planets, *user_data[3:])
     else:
-        await message.answer("Недостаточно планет!")
+      await message.answer("Недостаточно планет!")
   else:
-await message.answer("Ошибка получения данных пользователя.")
+    await message.answer("Ошибка получения данных пользователя.")
 
 def update_user_discoveries(user_id, found_message):
     user_data = get_user_data(user_id)
