@@ -100,7 +100,7 @@ async def show_profile(message: types.Message):
     response += f"Ваш игровой уровень: {calculate_level(discovered_planets)}\n"
     response += f"Играете в бота с: {start_time_obj.strftime('%d.%m.%Y %H:%M')}"
     await message.answer(response)
-else:
+ else:
   await handle_user_data_error(message)
 
 @dp.message_handler(commands=['planet', 'планета'])
