@@ -85,24 +85,23 @@ async def show_discoveries(message: types.Message):
 
 @dp.message_handler(commands=['profile', 'проф', 'профиль'])
 async def show_profile(message: types.Message):
-    user_id = message.from_user.id
-    user_data = get_user_data(user_id)
-    if user_data:
-        nickname, discovered_planets, space_artifacts, planet_names_str, start_time_str = user_data
-        planet_names_list = [p.strip() for p in planet_names_str.split(',') if p.strip()] if planet_names_str else []
-        start_time_obj = datetime.fromisoformat(start_time_str)
-        response = f"{nickname}, ваш профиль:\n" if nickname else "Ваш профиль:\n"
-        response += f"Всего найдено планет: {discovered_planets}\n"
-        response += f"Найденные планеты: {(', '.join(planet_names_list) or 'Еще не найдено ни одной планеты')}\n"
-        response += f"Найдено космических кораблей: {space_artifacts.count('космический корабль древней цивилизации')}\n"
-        response += f"Найдено осколков астероида: {space_artifacts.count('осколок астероида с редкими минералами')}\n"
-        response += f"Ваш игровой уровень: {calculate_level(discovered_planets)}\n"
-        response += f"Играете в бота с: {start_time_obj.strftime('%d.%m.%Y %H:%M')}"
-        await message.answer(response)
-    else:
-        await handle_user_data_error(message)
-
-
+  user_id = message.from_user.id
+  user_data = get_user_data(user_id)
+  if user_data:
+    nickname, discovered_planets, space_artifacts, planet_names_str, start_time_str, user_level = user_data
+    
+    planet_names_list = [p.strip() for p in planet_names_str.split(',') if p.strip()]
+    start_time_obj = datetime.fromisoformat(start_time_str)
+    response = f"{nickname}, ваш профиль:\n" if nickname else "Ваш профиль:\n"
+    response += f"Всего найдено планет: {discovered_planets}\n"
+    response += f"Найденные планеты: {(', '.join(planet_names_list) or 'Еще не найдено ни одной планеты')}\n"
+    response += f"Найдено космических кораблей: {space_artifacts.count('космический корабль древней цивилизации')}\n"
+    response += f"Найдено осколков астероида: {space_artifacts.count('осколок астероида с редкими минералами')}\n"
+    response += f"Ваш игровой уровень: {calculate_level(discovered_planets)}\n"
+    response += f"Играете в бота с: {start_time_obj.strftime('%d.%m.%Y %H:%M')}"
+    await message.answer(response)
+else:
+  await handle_user_data_error(message)
 
 @dp.message_handler(commands=['planet', 'планета'])
 async def describe_planet(message: types.Message):
