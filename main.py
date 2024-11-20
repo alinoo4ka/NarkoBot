@@ -11,6 +11,8 @@ bot = Bot(token=API_TOKEN)
 dp = Dispatcher(bot)
 DB_NAME = 'planet_explorer.db'
 
+level_prices = [10, 30, 90, 270]
+
 def init_db():
   with sqlite3.connect(DB_NAME) as conn:
     cursor = conn.cursor()
@@ -20,8 +22,9 @@ def init_db():
               discovered_planets INTEGER DEFAULT 0,
               space_artifacts TEXT DEFAULT '',
               planet_names TEXT DEFAULT '',
-              start_time TEXT
-            )''')
+              start_time TEXT,
+              user_level INTEGER DEFAULT 1
+            )''') # Добавлен столбец user_level
     conn.commit()
 
 init_db()
@@ -30,23 +33,23 @@ def get_user_data(user_id):
   try:
     with sqlite3.connect(DB_NAME) as conn:
       cursor = conn.cursor()
-      cursor.execute("SELECT nickname, discovered_planets, space_artifacts, planet_names, start_time FROM users WHERE user_id = ?", (user_id,))
+      cursor.execute("SELECT nickname, discovered_planets, space_artifacts, planet_names, start_time, user_level FROM users WHERE user_id = ?", (user_id,))
       data = cursor.fetchone()
       if data is None:
-        return None, 0, '', '', datetime.now().isoformat()
+        return None, 0, '', '', datetime.now().isoformat(), 1
       else:
         return data
   except sqlite3.Error as e:
     print(f"Ошибка при получении данных пользователя: {e}")
-    return None, 0, '', '', ''
+    return None, 0, '', '', '', 1
 
 
-def update_user_data(user_id, nickname, discovered_planets, space_artifacts, planet_names, start_time):
+def update_user_data(user_id, nickname, discovered_planets, space_artifacts, planet_names, start_time, user_level):
   try:
     with sqlite3.connect(DB_NAME) as conn:
       cursor = conn.cursor()
-      cursor.execute("INSERT OR REPLACE INTO users (user_id, nickname, discovered_planets, space_artifacts, planet_names, start_time) VALUES (?, ?, ?, ?, ?, ?)",
-              (user_id, nickname, discovered_planets, space_artifacts, planet_names, start_time))
+      cursor.execute("INSERT OR REPLACE INTO users (user_id, nickname, discovered_planets, space_artifacts, planet_names, start_time, user_level) VALUES (?, ?, ?, ?, ?, ?, ?)",
+              (user_id, nickname, discovered_planets, space_artifacts, planet_names, start_time, user_level))
       conn.commit()
   except sqlite3.Error as e:
     print(f"Ошибка при обновлении данных пользователя: {e}")
@@ -55,19 +58,19 @@ def update_user_data(user_id, nickname, discovered_planets, space_artifacts, pla
 async def handle_user_data_error(message):
   await message.answer("Ошибка получения данных пользователя.")
 
+
 @dp.message_handler(commands=['start'])
 async def start_message(message: types.Message):
   user_id = message.from_user.id
   user_data = get_user_data(user_id)
   if user_data is not None:
-        nickname, discovered_planets, space_artifacts, planet_names, start_time = user_data
-        await message.answer(f"Добро пожаловать обратно, {nickname or 'пользователь'}! Ваш прогресс сохранен.")
+        nickname, discovered_planets, space_artifacts, planet_names, start_time, user_level = user_data
+        await message.answer(f"Добро пожаловать обратно, {nickname or 'пользователь'}! Ваш прогресс сохранен. Ваш уровень: {user_level}")
   else:
         start_time = datetime.now().isoformat()
-        update_user_data(user_id, None, 0, '', '', start_time)
-        await message.answer("Привет! Я - бот, который любит исследовать космос. 🚀\n\nНачнем с создания вашего никнейма! Используйте команду /гник [никнейм]")
-
-
+        update_user_data(user_id, None, 0, '', '', start_time, 1)
+        await message.answer("Привет! Я - бот, который любит исследовать космос. 🚀\n\nНачнем с создания вашего никнейма! Используйте команду /гник [никнейм]")    
+                
 @dp.message_handler(commands=['cosmo', 'космос'])
 async def show_discoveries(message: types.Message):
     user_id = message.from_user.id
@@ -166,8 +169,8 @@ async def show_level(message: types.Message):
     if user_data is None:
         await handle_user_data_error(message)
         return
-    discovered_planets = user_data[1]
-    current_level = calculate_level(discovered_planets, [10, 30, 90, 270])
+    discovered_planets, user_level = user_data[1], user_data[5]
+    current_level = user_level
     required_planets = level_prices[current_level - 1] if current_level <= len(level_prices) else 0
     response = f"Ваш уровень на данный момент: {current_level}\n"
     response += f"Чтобы прокачать уровень необходимо:\n"
@@ -185,16 +188,15 @@ async def process_callback_upgrade_level(message: types.Message):
     if user_data is None:
         await handle_user_data_error(message)
         return
-    nickname, discovered_planets, space_artifacts, planet_names, start_time = user_data
-    current_level = calculate_level(discovered_planets, [10, 30, 90, 270])
+    nickname, discovered_planets, space_artifacts, planet_names, start_time, user_level = user_data
+    current_level = user_level
     required_planets = level_prices[current_level - 1] if current_level <= len(level_prices) else 0
     if discovered_planets >= required_planets:
         new_level = current_level + 1
-        update_user_data(user_id, nickname, discovered_planets, space_artifacts, planet_names, start_time)
+        update_user_data(user_id, nickname, discovered_planets, space_artifacts, planet_names, start_time, new_level)
         await message.answer(f"Поздравляю! Вы повысили свой уровень до {new_level}!")
     else:
         await message.answer(f"Недостаточно планет для повышения уровня. Вам нужно ещё {required_planets - discovered_planets} планет.")
-
 
 
 def update_user_discoveries(user_id, found_message, current_time):
@@ -224,15 +226,15 @@ def generate_planet_name():
     suffixes = ["-42", "-77", "-13", "-99", "-20"]
     return random.choice(prefixes) + random.choice(suffixes)
 
-def calculate_level(planets_discovered, level_prices):
-  level = 1
-  for price in level_prices:
-    if planets_discovered >= price:
-      level += 1
-    else:
-      break
-      return min(level, len(level_prices) + 1)
-
+def calculate_level(planets_discovered):
+    level = 1
+    for price in level_prices:
+        if planets_discovered >= price:
+            level += 1
+        else:
+            break
+    return min(level, len(level_prices) + 1)
+  
 @dp.message_handler(commands=['гник', 'gnick'])
 async def set_nickname(message: types.Message):
     args = message.text.split()
