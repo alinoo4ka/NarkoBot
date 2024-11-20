@@ -200,9 +200,9 @@ async def process_callback_upgrade_level(message: types.Message):
     if discovered_planets >= required_planets:
         new_level = current_level + 1
         update_user_data(user_id, nickname, discovered_planets, space_artifacts, planet_names, start_time, new_level)
-        await message.answer(f"Поздравляю! Вы повысили свой уровень до {new_level}!")
+        await message.answer(f"Поздравляю! Вы повысили свой уровень до {new_level}!", reply_markup=None)
     else:
-        await message.answer(f"Недостаточно планет для повышения уровня. Вам нужно ещё {required_planets - discovered_planets} планет.")
+        await message.answer(f"Недостаточно планет для повышения уровня. Вам нужно ещё {required_planets - discovered_planets} планет", reply_markup=None)
 
 
 def update_user_discoveries(user_id, found_message, current_time):
