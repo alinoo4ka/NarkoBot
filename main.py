@@ -134,7 +134,7 @@ async def describe_planet(message: types.Message):
     else:
         await message.answer("Планета не найдена! 🕵️‍♀️")
 
-@dp.message_handler(regexp=r"^Искать планету$")
+@dp.message_handler(regexp=r'^Искать планету$')
 async def find_planet(message: types.Message):
     user_id = message.from_user.id
     user_data = get_user_data(user_id)
@@ -146,7 +146,8 @@ async def find_planet(message: types.Message):
     try:
         last_search_time = datetime.fromisoformat(user_data[-1])
         time_since_last_search = current_time - last_search_time
-    except (ValueError, TypeError, AttributeError):
+    except ValueError:
+        # В случае ошибки установим текущее время как последнее время поиска
         last_search_time = current_time
         time_since_last_search = timedelta(0)
 
@@ -166,7 +167,6 @@ async def find_planet(message: types.Message):
     found_message = random.choice(messages).format(planet_name=generate_planet_name())
     await message.answer(found_message)
     update_user_discoveries(user_id, found_message, current_time.isoformat())
-
 
 @dp.message_handler(commands=['lvl', 'уровень'])
 async def show_level(message: types.Message):
