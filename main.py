@@ -226,7 +226,7 @@ def update_user_discoveries(user_id, found_message, current_time):
         update_user_data(user_id, nickname, discovered_planets, space_artifacts_str, planet_names_str, current_time)
     except Exception as e:
         print(f"Ошибка при обновлении данных о находках: {e}")
-
+      
 def generate_planet_name():
     prefixes = ["Альта", "Бета", "Гамма", "Дельта", "Эпсилон", "Зи", "Эта", "Тета", "Йота", "Каппа"]
     suffixes = ["-42", "-77", "-13", "-99", "-20"]
