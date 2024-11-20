@@ -167,7 +167,7 @@ async def show_level(message: types.Message):
         await handle_user_data_error(message)
         return
     discovered_planets = user_data[1]
-    current_level = calculate_level(discovered_planets)
+    current_level = calculate_level(discovered_planets, [10, 30, 90, 270])
     required_planets = level_prices[current_level - 1] if current_level <= len(level_prices) else 0
     response = f"Ваш уровень на данный момент: {current_level}\n"
     response += f"Чтобы прокачать уровень необходимо:\n"
@@ -186,7 +186,7 @@ async def process_callback_upgrade_level(message: types.Message):
         await handle_user_data_error(message)
         return
     nickname, discovered_planets, space_artifacts, planet_names, start_time = user_data
-    current_level = calculate_level(discovered_planets)
+    current_level = calculate_level(discovered_planets, [10, 30, 90, 270])
     required_planets = level_prices[current_level - 1] if current_level <= len(level_prices) else 0
     if discovered_planets >= required_planets:
         new_level = current_level + 1
@@ -224,7 +224,7 @@ def generate_planet_name():
     suffixes = ["-42", "-77", "-13", "-99", "-20"]
     return random.choice(prefixes) + random.choice(suffixes)
 
-def calculate_level(planets_discovered):
+def calculate_level(planets_discovered, level_prices):
     level_prices = [10, 30, 90, 270]
     level = 1
     for price in level_prices:
