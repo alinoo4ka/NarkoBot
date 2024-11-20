@@ -144,9 +144,9 @@ async def find_planet(message: types.Message):
 
     current_time = datetime.now()
     try:
-        last_search_time = datetime.fromisoformat(user_data[-1])
+        last_search_time = datetime.fromisoformat(str(user_data[-1]))
         time_since_last_search = current_time - last_search_time
-    except ValueError:
+    except (ValueError, TypeError):
         # В случае ошибки установим текущее время как последнее время поиска
         last_search_time = current_time
         time_since_last_search = timedelta(0)
@@ -167,7 +167,7 @@ async def find_planet(message: types.Message):
     found_message = random.choice(messages).format(planet_name=generate_planet_name())
     await message.answer(found_message)
     update_user_discoveries(user_id, found_message, current_time.isoformat())
-
+  
 @dp.message_handler(commands=['lvl', 'уровень'])
 async def show_level(message: types.Message):
     user_id = message.from_user.id
