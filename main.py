@@ -11,7 +11,7 @@ bot = Bot(token=API_TOKEN)
 dp = Dispatcher(bot)
 DB_NAME = 'planet_explorer.db'
 
-level_prices = [10, 30, 90, 270]
+level_prices = [1, 3, 9, 270]
 
 def init_db():
   with sqlite3.connect(DB_NAME) as conn:
@@ -151,7 +151,7 @@ async def find_planet(message: types.Message):
         last_search_time = current_time
         time_since_last_search = timedelta(0)
 
-    time_to_wait = timedelta(minutes=30) - time_since_last_search
+    time_to_wait = timedelta(minutes=2) - time_since_last_search
     if time_to_wait > timedelta(0):
         minutes, seconds = divmod(time_to_wait.total_seconds(), 60)
         await message.answer(f"Подождите, пожалуйста, до конца ожидания осталось: {int(minutes)} минут и {int(seconds)} секунд.")
