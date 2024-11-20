@@ -225,15 +225,13 @@ def generate_planet_name():
     return random.choice(prefixes) + random.choice(suffixes)
 
 def calculate_level(planets_discovered, level_prices):
-    level_prices = [10, 30, 90, 270]
-    level = 1
-    for price in level_prices:
-        if planets_discovered >= price:
-            level += 1
-        else:
-            break
-    return min(level, len(level_prices) + 1)
-
+  level = 1
+  for price in level_prices:
+    if planets_discovered >= price:
+      level += 1
+    else:
+      break
+      return min(level, len(level_prices) + 1)
 
 @dp.message_handler(commands=['гник', 'gnick'])
 async def set_nickname(message: types.Message):
