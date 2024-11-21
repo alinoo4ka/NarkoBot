@@ -143,15 +143,16 @@ async def find_planet(message: types.Message):
         return
 
     current_time = datetime.now()
+    
     try:
         last_search_time = datetime.fromisoformat(str(user_data[-1]))
         time_since_last_search = current_time - last_search_time
-    except (ValueError, TypeError):
-        # В случае ошибки установим текущее время как последнее время поиска
+    except (ValueError, IndexError, TypeError):
         last_search_time = current_time
-        time_since_last_search = timedelta(0)
+        time_to_wait = timedelta(0)
+    else:
+        time_to_wait = timedelta(minutes=2) - time_since_last_search
 
-    time_to_wait = timedelta(minutes=2) - time_since_last_search
     if time_to_wait > timedelta(0):
         minutes, seconds = divmod(time_to_wait.total_seconds(), 60)
         await message.answer(f"Подождите, пожалуйста, до конца ожидания осталось: {int(minutes)} минут и {int(seconds)} секунд.")
