@@ -252,11 +252,14 @@ async def set_nickname(message: types.Message):
     user_id = message.from_user.id
     user_data = get_user_data(user_id)
     if user_data:
-        update_user_data(user_id, nickname, user_data[1], user_data[2], user_data[3], user_data[4])
+        # Проверяем длину списка user_data и используем доступные элементы
+        data_len = min(len(user_data), 4)
+        arguments = [user_id, nickname] + user_data[:data_len]
+        update_user_data(*arguments)
         await message.answer(f"Ваш никнейм изменен на {nickname}")
     else:
         await handle_user_data_error(message)
-
+      
 async def on_startup(dp):
     print('Бот запущен')
 
